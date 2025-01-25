@@ -12,6 +12,7 @@ import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirectio
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.localization.constants.TwoWheelConstants;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -49,6 +50,8 @@ public class LocalizationTest extends OpMode {
     private DcMotorEx rightFront;
     private DcMotorEx rightRear;
     private List<DcMotorEx> motors;
+//    public static double FORWARD_Y = -89;
+//    public static double STRAFE_X = 11;
 
     /**
      * This initializes the PoseUpdater, the mecanum drive motors, and the FTC Dashboard telemetry.
@@ -126,5 +129,11 @@ public class LocalizationTest extends OpMode {
         Drawing.drawPoseHistory(dashboardPoseTracker, "#4CAF50");
         Drawing.drawRobot(poseUpdater.getPose(), "#4CAF50");
         Drawing.sendPacket();
+//        if (gamepad1.a){
+//            TwoWheelConstants.forwardY = FORWARD_Y;
+//            TwoWheelConstants.strafeX = STRAFE_X;
+//            poseUpdater = new PoseUpdater(hardwareMap);
+//            dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
+//        }
     }
 }
