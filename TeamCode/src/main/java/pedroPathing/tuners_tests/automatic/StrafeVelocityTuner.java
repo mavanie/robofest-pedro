@@ -60,7 +60,7 @@ public class StrafeVelocityTuner extends OpMode {
 
     private PoseUpdater poseUpdater;
 
-    public static double DISTANCE = 48;
+    public static double DISTANCE = 20;
     public static double RECORD_NUMBER = 10;
 
     private Telemetry telemetryA;
@@ -102,11 +102,11 @@ public class StrafeVelocityTuner extends OpMode {
         }
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches to the right.");
-        telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
-        telemetryA.addLine("After running the distance, the robot will cut power from the drivetrain and display the strafe velocity.");
-        telemetryA.addLine("Press CROSS or A on game pad 1 to stop.");
-        telemetryA.update();
+//        telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches to the right.");
+//        telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
+//        telemetryA.addLine("After running the distance, the robot will cut power from the drivetrain and display the strafe velocity.");
+//        telemetryA.addLine("Press CROSS or A on game pad 1 to stop.");
+//        telemetryA.update();
     }
 
     /**
@@ -137,6 +137,9 @@ public class StrafeVelocityTuner extends OpMode {
         }
 
         poseUpdater.update();
+        telemetryA.addData("X Position", poseUpdater.getPose().getX());
+        telemetryA.addData("Y Position", poseUpdater.getPose().getY());
+        telemetryA.update();
         if (!end) {
             if (Math.abs(poseUpdater.getPose().getY()) > DISTANCE) {
                 end = true;
