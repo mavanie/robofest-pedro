@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
@@ -12,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import kotlin.Unit;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
@@ -19,8 +22,9 @@ import pedroPathing.constants.LConstants;
 @Config
 public class RobofestMain extends LinearOpMode {
     private Follower follower;
-    public static Pose startPose = new Pose(28, 7, Math.toRadians(0));
-    public static Pose crossPose = new Pose(28, 100, Math.toRadians(0));
+    public static Pose startPose = new Pose(5.5, 35, Math.toRadians(0));
+    public static Pose crossPose = new Pose(55, 35, Math.toRadians(0));
+
     private Servo claw;
     private Servo lift;
     public static double LIFT_DOWN = 0;
@@ -31,6 +35,9 @@ public class RobofestMain extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
+        follower.setStartingPose(startPose);
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         claw = hardwareMap.get(Servo.class, "claw");
         lift = hardwareMap.get(Servo.class, "lift");
@@ -74,6 +81,13 @@ public class RobofestMain extends LinearOpMode {
                     break;
             }
             oldPressed = pressed;
+            telemetry.addData("state", state);
+            telemetry.addData("X", follower.getPose().getX());
+            telemetry.addData("Y", follower.getPose().getY());
+            telemetry.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
+            telemetry.addData("lift", lift.getPosition());
+            telemetry.addData("claw", claw.getPosition());
+            telemetry.update();
         }
     }
 }
