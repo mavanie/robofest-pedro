@@ -9,6 +9,7 @@ import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -25,16 +26,21 @@ public class RobofestMain extends LinearOpMode {
     public static Pose startPoseNorth = new Pose(5.5, 14, Math.toRadians(90));
     public static Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
     public static Pose startPose = startPoseEast;
+
+    public static Pose white1Pose = new Pose(13, 16, Math.toRadians(90));
+    public static Pose white2Pose = new Pose(25.5, 16, Math.toRadians(90));
+    public static Pose whitePose = white1Pose;
     public static Pose crossPose = new Pose(55, 14, Math.toRadians(0));
     public static Pose boxPose = new Pose(30, 14, Math.toRadians(0));
     public static Pose pickupPose = new Pose(30, 9, Math.toRadians(-90));
-
     private Servo claw;
     private Servo lift;
     public static double LIFT_DOWN = 0;
     public static double LIFT_UP = 0.6;
     public static double CLAW_OPEN = 0;
     public static double CLAW_CLOSED = 1;
+    private Timer stateTime = new Timer();
+    private int state = 0;
     @Override
     public void runOpMode(){
         Constants.setConstants(FConstants.class, LConstants.class);
@@ -47,30 +53,28 @@ public class RobofestMain extends LinearOpMode {
         lift = hardwareMap.get(Servo.class, "lift");
 
         TouchSensor button = hardwareMap.get(TouchSensor.class, "button");
-        int state = 0;
-
         boolean oldPressed = false;
 
         PathChain box = follower.pathBuilder()
             .addPath(new BezierLine(new Point(startPose), new Point(boxPose)))
             .build();
-        PathChain turn = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(boxPose), new Point(boxPose)))
-            .setLinearHeadingInterpolation(boxPose.getHeading(), pickupPose.getHeading())
-            .build();
         PathChain pickup = follower.pathBuilder()
             .addPath(new BezierLine(new Point(boxPose), new Point(pickupPose)))
             .build();
+        PathChain whiteBox = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(startPose), new Point(whitePose)))
+                .setLinearHeadingInterpolation(startPose.getHeading(),whitePose.getHeading())
+                .build();
 
         while(!isStopRequested()) {
             follower.update();
             boolean pressed = button.isPressed();
             if (pressed && !oldPressed) {
                 if (state == 0) {
-                    follower.followPath(box);
-                    state = 1;
+                    follower.followPath(whiteBox);
+                   changeState(1);
                 }else{
-                    state = 0;
+                    changeState(0);
                 }
             }
             switch (state) {
@@ -78,31 +82,35 @@ public class RobofestMain extends LinearOpMode {
                     follower.breakFollowing();
                     follower.setPose(startPose);
                     if (gamepad1.a) {
-                        lift.setPosition(LIFT_DOWN);
+                        liftDown();
                     }
                     if (gamepad1.b) {
-                        lift.setPosition(LIFT_UP);
+                        liftUp();
                     }
                     if (gamepad1.x) {
                         claw.setPosition(CLAW_OPEN);
                     }
                     if (gamepad1.y) {
-                        claw.setPosition(CLAW_CLOSED);
+                        closeClaw();
                     }
                     break;
                 case 1:
                     if (!follower.isBusy()) {
-                        follower.holdPoint(new Pose(boxPose.getX(), boxPose.getY(), pickupPose.getHeading()));
-                        state = 2;
+                        liftDown();
+                        changeState(2);
                     }
                     break;
                 case 2:
-                    if (Math.abs(follower.headingError) < Math.toRadians(5)) {
-                        follower.followPath(pickup);
-                        state = 3;
+                    if (stateTime.getElapsedTimeSeconds() > 4.6)  {
+                        closeClaw();
+                        changeState(3);
                     }
                     break;
                 case 3:
+                    if (stateTime.getElapsedTimeSeconds() > 1.4)  {
+                        liftUp();
+                        changeState(4);
+                    }
                     break;
             }
             oldPressed = pressed;
@@ -116,5 +124,22 @@ public class RobofestMain extends LinearOpMode {
             telemetry.addData("claw", claw.getPosition());
             telemetry.update();
         }
+    }
+
+    private void liftUp() {
+        lift.setPosition(LIFT_UP);
+    }
+
+    private void closeClaw() {
+        claw.setPosition(CLAW_CLOSED);
+    }
+
+    private void liftDown() {
+        lift.setPosition(LIFT_DOWN);
+    }
+    private void changeState(int newState) {
+        stateTime.resetTimer();
+        state = newState;
+
     }
 }
