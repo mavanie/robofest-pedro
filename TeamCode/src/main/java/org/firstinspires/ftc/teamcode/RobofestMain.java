@@ -35,10 +35,11 @@ public class RobofestMain extends LinearOpMode {
     public static Pose pickupPose = new Pose(30, 9, Math.toRadians(-90));
     private Servo claw;
     private Servo lift;
+    private AlphaDisplay display;
     public static double LIFT_DOWN = 0;
     public static double LIFT_UP = 0.6;
-    public static double CLAW_OPEN = 0;
-    public static double CLAW_CLOSED = 1;
+    public static double CLAW_OPEN = 1;
+    public static double CLAW_CLOSED = 0;
     private Timer stateTime = new Timer();
     private int state = 0;
     @Override
@@ -51,6 +52,7 @@ public class RobofestMain extends LinearOpMode {
 
         claw = hardwareMap.get(Servo.class, "claw");
         lift = hardwareMap.get(Servo.class, "lift");
+        display = hardwareMap.get(AlphaDisplay.class, "display");
 
         TouchSensor button = hardwareMap.get(TouchSensor.class, "button");
         boolean oldPressed = false;
@@ -139,6 +141,7 @@ public class RobofestMain extends LinearOpMode {
     }
     private void changeState(int newState) {
         stateTime.resetTimer();
+        display.writeNumber(newState);
         state = newState;
 
     }

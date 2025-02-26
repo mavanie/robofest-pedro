@@ -150,6 +150,17 @@ public class AlphaDisplay extends I2cDeviceSynchDevice<I2cDeviceSynch>{
         display[position*2+1] = (byte)(code >> 8);
     }
 
+    public void writeNumber(int number) {
+        int ones = number % 10;
+        writeCharacter((char) ('0' + ones), 3, false);
+        int tens = (number / 10) % 10;
+        writeCharacter((char) ('0' + tens), 2, false);
+        int hundreds = (number / 100) % 10;
+        writeCharacter((char) ('0' + hundreds), 1, false);
+        int thousands = (number / 1000) % 10;
+        writeCharacter((char) ('0' + thousands), 0, false);
+    }
+
     @Override
     public Manufacturer getManufacturer() {
         return Manufacturer.Adafruit;
