@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
@@ -27,11 +28,14 @@ public class RobofestMain extends LinearOpMode {
     public static Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
     public static Pose startPose = startPoseEast;
 
-    public static Pose white1Pose = new Pose(13, 16, Math.toRadians(90));
-    public static Pose white2Pose = new Pose(25.5, 16, Math.toRadians(90));
+    public static Pose boxBpose = new Pose (18.5, 13, Math.toRadians(-90));
+    public static Pose boxCpose = new Pose(30, 13, Math.toRadians(-90));
+    public static Pose stackPose = boxBpose;
+    public static Pose blackPose = boxCpose;
+    public static Pose white1Pose = new Pose(13.5, 16.5, Math.toRadians(90));
+    public static Pose white2Pose = new Pose(25.5, 16.5, Math.toRadians(90));
     public static Pose whitePose = white1Pose;
     public static Pose crossPose = new Pose(55, 14, Math.toRadians(0));
-    public static Pose boxPose = new Pose(30, 14, Math.toRadians(0));
     public static Pose pickupPose = new Pose(30, 9, Math.toRadians(-90));
     private Servo claw;
     private Servo lift;
@@ -58,15 +62,28 @@ public class RobofestMain extends LinearOpMode {
         boolean oldPressed = false;
 
         PathChain box = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(startPose), new Point(boxPose)))
-            .build();
+                .addPath(new BezierLine(new Point(startPose), new Point(boxPose)))
+                .build();
         PathChain pickup = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(boxPose), new Point(pickupPose)))
-            .build();
+                .addPath(new BezierLine(new Point(boxPose), new Point(pickupPose)))
+                .build();
         PathChain whiteBox = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose), new Point(whitePose)))
                 .setLinearHeadingInterpolation(startPose.getHeading(),whitePose.getHeading())
                 .build();
+        PathChain stack = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(whitePose), new Point (stackPose)))
+                .setLinearHeadingInterpolation(whitePose.getHeading(), stackPose.getHeading())
+                .build();
+        PathChain back = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY() + 5)))
+                .setConstantHeadingInterpolation(stackPose.getHeading())
+                .build();
+
+
+        changeState(0);
+        liftUp();
+        openClaw();
 
         while(!isStopRequested()) {
             follower.update();
@@ -76,6 +93,8 @@ public class RobofestMain extends LinearOpMode {
                     follower.followPath(whiteBox);
                    changeState(1);
                 }else{
+                    liftUp();
+                    openClaw();
                     changeState(0);
                 }
             }
@@ -90,7 +109,7 @@ public class RobofestMain extends LinearOpMode {
                         liftUp();
                     }
                     if (gamepad1.x) {
-                        claw.setPosition(CLAW_OPEN);
+                        openClaw();
                     }
                     if (gamepad1.y) {
                         closeClaw();
@@ -114,9 +133,35 @@ public class RobofestMain extends LinearOpMode {
                         changeState(4);
                     }
                     break;
+                case 4:
+                    if (stateTime.getElapsedTimeSeconds() > 3) {
+                        follower.followPath(stack);
+                        changeState(5);
+                    }
+                    break;
+                case 5:
+                    if (!follower.isBusy()) {
+                        changeState(6);
+                    }
+                    break;
+                case 6:
+                    if (stateTime.getElapsedTimeSeconds() > 1)
+                        openClaw();
+                        changeState(7);
+                case 7:
+                    if (stateTime.getElapsedTimeSeconds() > 1.4) {
+                        follower.followPath(back);
+                        changeState(8);
+                    }
+                    break;
+                case 8:
+                    if (!follower.isBusy()) {
+                        changeState(9);
+                    }
             }
             oldPressed = pressed;
             telemetry.addData("state", state);
+            telemetry.addData("stateTime", stateTime.getElapsedTimeSeconds());
             telemetry.addData("busy", follower.isBusy());
             telemetry.addData("X", follower.getPose().getX());
             telemetry.addData("Y", follower.getPose().getY());
@@ -128,21 +173,26 @@ public class RobofestMain extends LinearOpMode {
         }
     }
 
+    private void openClaw() {
+        claw.setPosition(CLAW_OPEN);
+    }
+
     private void liftUp() {
         lift.setPosition(LIFT_UP);
+    }
+
+    private void liftDown() {
+        lift.setPosition(LIFT_DOWN);
     }
 
     private void closeClaw() {
         claw.setPosition(CLAW_CLOSED);
     }
 
-    private void liftDown() {
-        lift.setPosition(LIFT_DOWN);
-    }
     private void changeState(int newState) {
         stateTime.resetTimer();
         display.writeNumber(newState);
+        display.updateDisplay();
         state = newState;
-
     }
 }
