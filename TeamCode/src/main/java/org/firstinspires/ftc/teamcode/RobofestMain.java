@@ -61,12 +61,12 @@ public class RobofestMain extends LinearOpMode {
         TouchSensor button = hardwareMap.get(TouchSensor.class, "button");
         boolean oldPressed = false;
 
-        PathChain box = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(startPose), new Point(boxPose)))
-                .build();
-        PathChain pickup = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(boxPose), new Point(pickupPose)))
-                .build();
+//        PathChain box = follower.pathBuilder()
+//                .addPath(new BezierLine(new Point(startPose), new Point(boxPose)))
+//                .build();
+//        PathChain pickup = follower.pathBuilder()
+//                .addPath(new BezierLine(new Point(boxPose), new Point(pickupPose)))
+//                .build();
         PathChain whiteBox = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose), new Point(whitePose)))
                 .setLinearHeadingInterpolation(startPose.getHeading(),whitePose.getHeading())
@@ -91,8 +91,8 @@ public class RobofestMain extends LinearOpMode {
             if (pressed && !oldPressed) {
                 if (state == 0) {
                     follower.followPath(whiteBox);
-                   changeState(1);
-                }else{
+                    changeState(1);
+                } else {
                     liftUp();
                     openClaw();
                     changeState(0);
@@ -122,13 +122,13 @@ public class RobofestMain extends LinearOpMode {
                     }
                     break;
                 case 2:
-                    if (stateTime.getElapsedTimeSeconds() > 4.6)  {
+                    if (stateTime.getElapsedTimeSeconds() > 4.6) {
                         closeClaw();
                         changeState(3);
                     }
                     break;
                 case 3:
-                    if (stateTime.getElapsedTimeSeconds() > 1.4)  {
+                    if (stateTime.getElapsedTimeSeconds() > 1.4) {
                         liftUp();
                         changeState(4);
                     }
@@ -145,9 +145,10 @@ public class RobofestMain extends LinearOpMode {
                     }
                     break;
                 case 6:
-                    if (stateTime.getElapsedTimeSeconds() > 1)
+                    if (stateTime.getElapsedTimeSeconds() > 1) {
                         openClaw();
                         changeState(7);
+                    }
                 case 7:
                     if (stateTime.getElapsedTimeSeconds() > 1.4) {
                         follower.followPath(back);
