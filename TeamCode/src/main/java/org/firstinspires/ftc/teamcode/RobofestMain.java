@@ -45,7 +45,8 @@ public class RobofestMain extends LinearOpMode {
     public static double CLAW_OPEN = 1;
     public static double CLAW_CLOSED = 0;
     private Timer stateTime = new Timer();
-    private int state = 0;
+    private int state = -1;
+    private int oldState = -1;
     @Override
     public void runOpMode(){
         Constants.setConstants(FConstants.class, LConstants.class);
@@ -82,24 +83,28 @@ public class RobofestMain extends LinearOpMode {
 
 
         changeState(0);
-        liftUp();
-        openClaw();
 
         while(!isStopRequested()) {
             follower.update();
+
+            boolean enter = state != oldState;
+            oldState = state;
+
             boolean pressed = button.isPressed();
             if (pressed && !oldPressed) {
                 if (state == 0) {
-                    follower.followPath(whiteBox);
                     changeState(1);
                 } else {
-                    liftUp();
-                    openClaw();
                     changeState(0);
                 }
             }
+
             switch (state) {
                 case 0:
+                    if(enter) {
+                        liftUp();
+                        openClaw();
+                    }
                     follower.breakFollowing();
                     follower.setPose(startPose);
                     if (gamepad1.a) {
@@ -116,46 +121,61 @@ public class RobofestMain extends LinearOpMode {
                     }
                     break;
                 case 1:
+                    if (enter) {
+                        follower.followPath(whiteBox);
+                    }
                     if (!follower.isBusy()) {
-                        liftDown();
                         changeState(2);
                     }
                     break;
                 case 2:
+                    if (enter) {
+                        liftDown();
+                    }
                     if (stateTime.getElapsedTimeSeconds() > 4.6) {
-                        closeClaw();
                         changeState(3);
                     }
                     break;
                 case 3:
+                    if (enter) {
+                        closeClaw();
+                    }
                     if (stateTime.getElapsedTimeSeconds() > 1.4) {
-                        liftUp();
                         changeState(4);
                     }
                     break;
                 case 4:
+                    if (enter) {
+                        liftUp();
+                    }
                     if (stateTime.getElapsedTimeSeconds() > 3) {
-                        follower.followPath(stack);
                         changeState(5);
                     }
                     break;
                 case 5:
+                    if (enter) {
+                        follower.followPath(stack);
+                    }
                     if (!follower.isBusy()) {
                         changeState(6);
                     }
                     break;
                 case 6:
                     if (stateTime.getElapsedTimeSeconds() > 1) {
-                        openClaw();
                         changeState(7);
                     }
                 case 7:
+                    if (enter) {
+                        openClaw();
+                    }
                     if (stateTime.getElapsedTimeSeconds() > 1.4) {
-                        follower.followPath(back);
                         changeState(8);
                     }
                     break;
                 case 8:
+                    if (enter) {
+                        follower.followPath(back);
+                    }
                     if (!follower.isBusy()) {
                         changeState(9);
                     }
@@ -194,6 +214,7 @@ public class RobofestMain extends LinearOpMode {
         stateTime.resetTimer();
         display.writeNumber(newState);
         display.updateDisplay();
+        oldState = state;
         state = newState;
     }
 }
