@@ -42,6 +42,7 @@ public class RobofestMain extends LinearOpMode {
     private AlphaDisplay display;
     public static double LIFT_DOWN = 0;
     public static double LIFT_UP = 0.6;
+    public static double LIFT_MEDAL = 0.3;
     public static double CLAW_OPEN = 1;
     public static double CLAW_CLOSED = 0;
     private Timer stateTime = new Timer();
@@ -107,10 +108,13 @@ public class RobofestMain extends LinearOpMode {
                     }
                     follower.breakFollowing();
                     follower.setPose(startPose);
-                    if (gamepad1.a) {
+                    if (gamepad1.dpad_down) {
                         liftDown();
                     }
-                    if (gamepad1.b) {
+                    if (gamepad1.dpad_left) {
+                        liftMedal();
+                    }
+                    if (gamepad1.dpad_up) {
                         liftUp();
                     }
                     if (gamepad1.x) {
@@ -204,6 +208,10 @@ public class RobofestMain extends LinearOpMode {
 
     private void liftDown() {
         lift.setPosition(LIFT_DOWN);
+    }
+
+    private  void liftMedal() {
+        lift.setPosition(LIFT_MEDAL);
     }
 
     private void closeClaw() {
