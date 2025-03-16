@@ -28,6 +28,7 @@ public class RobofestMain extends LinearOpMode {
     public static double LIFT_DOWN = 0;
     public static double LIFT_UP = 0.6;
     public static double LIFT_MEDAL = 0.3;
+    public static double LIFT_START = 0.4;
     public static double CLAW_OPEN = 1;
     public static double CLAW_CLOSED = 0;
     private Timer stateTime = new Timer();
@@ -37,6 +38,7 @@ public class RobofestMain extends LinearOpMode {
     public void runOpMode(){
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
+        follower.setMaxPower(0.6);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -53,15 +55,19 @@ public class RobofestMain extends LinearOpMode {
         Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
         Pose startPose = startPoseEast;
 
-        Pose boxBpose = new Pose (18.5, 12, Math.toRadians(-90));
-        Pose boxCpose = new Pose(30, 12, Math.toRadians(-90));
+        Pose boxBpose = new Pose (19.5, 12, Math.toRadians(-90));
+        Pose boxCpose = new Pose(31.5, 12, Math.toRadians(-90));
         Pose stackPose = boxBpose;
         Pose blackPose = boxCpose;
         Pose white1Pose = new Pose(13.5, 17.5, Math.toRadians(90));
         Pose white2Pose = new Pose(25.5, 17.5, Math.toRadians(90));
+        Pose blackDropPose = new Pose(43,19 , Math.toRadians(135));
         Pose whitePose = white1Pose;
-        Pose crossPose = new Pose(55, 14, Math.toRadians(0));
+        Pose crossPose = new Pose(55, 20, Math.toRadians(0));
         Pose pickupPose = new Pose(30, 9, Math.toRadians(-90));
+        Pose legoSouth = new Pose(55, 10, Math.toRadians(-90));
+        Pose legoNorth = new Pose(55, 19, Math.toRadians(90));
+        Pose legoEast = new Pose(62, 16, Math.toRadians(0));
 
         follower.setStartingPose(startPose);
 
@@ -75,7 +81,7 @@ public class RobofestMain extends LinearOpMode {
             .setLinearHeadingInterpolation(whitePose.getHeading(), stackPose.getHeading())
             .build();
         PathChain back = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY() + 5)))
+            .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY() + 6)))
             .setConstantHeadingInterpolation(stackPose.getHeading())
             .build();
         PathChain blackBox = follower.pathBuilder()
@@ -83,15 +89,24 @@ public class RobofestMain extends LinearOpMode {
             .setConstantHeadingInterpolation(blackPose.getHeading())
             .addPath(new BezierLine(new Point(blackPose.getX(), blackPose.getY()+2), new Point(blackPose)))
             .build();
-
+        PathChain lego = follower.pathBuilder()
+            .addPath(new BezierLine(new Point(blackPose), new Point(blackPose.getX(), blackPose.getY()+8)))
+            .setConstantHeadingInterpolation(blackPose.getHeading())
+            .addPath(new BezierLine(new Point(blackPose.getX(), blackPose.getY()+8), new Point(crossPose)))
+            .setConstantHeadingInterpolation(blackPose.getHeading())
+            .addPath(new BezierLine(new Point(crossPose), new Point(legoSouth)))
+            .addPath(new BezierLine(new Point(legoSouth), new Point(crossPose.getX(), crossPose.getY()+6)))
+            .setConstantHeadingInterpolation(legoSouth.getHeading())
+            .addPath(new BezierLine(new Point(crossPose), new Point(legoEast)))
+            .setConstantHeadingInterpolation(legoEast.getHeading())
+            .addPath(new BezierLine(new Point(legoEast), new Point(blackDropPose)))
+            .setConstantHeadingInterpolation(blackDropPose.getHeading())
+            .build();
 
         changeState(0);
 
         while(!isStopRequested()) {
             follower.update();
-
-            boolean enter = state != oldState;
-            oldState = state;
 
             boolean pressed = button.isPressed();
             if (pressed && !oldPressed) {
@@ -102,10 +117,13 @@ public class RobofestMain extends LinearOpMode {
                 }
             }
 
+            boolean enter = state != oldState;
+            oldState = state;
+
             switch (state) {
                 case 0:
                     if(enter) {
-                        liftUp();
+                        liftStart();
                         openClaw();
                     }
                     follower.breakFollowing();
@@ -136,7 +154,7 @@ public class RobofestMain extends LinearOpMode {
                 case 20:
                     if (enter) {
                         liftDown();
-                    } else if (stateTime.getElapsedTimeSeconds() > 4.6) {
+                    } else if (stateTime.getElapsedTimeSeconds() > 3) {
                         changeState(30);
                     }
                     break;
@@ -201,6 +219,18 @@ public class RobofestMain extends LinearOpMode {
                         changeState(120);
                     }
                     break;
+                case 120:
+                    if (enter) {
+                        follower.followPath(lego);
+                    } else if (!follower.isBusy()) {
+                        changeState(130);
+                    }
+                    break;
+                case 130:
+                    if (enter) {
+                        follower.breakFollowing();
+                    }
+                    break;
             }
             oldPressed = pressed;
             telemetry.addData("state", state);
@@ -222,6 +252,10 @@ public class RobofestMain extends LinearOpMode {
 
     private void liftUp() {
         lift.setPosition(LIFT_UP);
+    }
+
+    private void liftStart() {
+        lift.setPosition(LIFT_START);
     }
 
     private void liftDown() {
