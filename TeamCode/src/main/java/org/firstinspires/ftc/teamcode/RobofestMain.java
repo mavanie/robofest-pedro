@@ -22,21 +22,6 @@ import pedroPathing.constants.LConstants;
 @Config
 public class RobofestMain extends LinearOpMode {
     private Follower follower;
-    public static Pose startPoseEast = new Pose(5.5, 14, Math.toRadians(0));
-    public static Pose startPoseWest = new Pose(5.5, 14, Math.toRadians(180));
-    public static Pose startPoseNorth = new Pose(5.5, 14, Math.toRadians(90));
-    public static Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
-    public static Pose startPose = startPoseEast;
-
-    public static Pose boxBpose = new Pose (18.5, 13, Math.toRadians(-90));
-    public static Pose boxCpose = new Pose(30, 13, Math.toRadians(-90));
-    public static Pose stackPose = boxBpose;
-    public static Pose blackPose = boxCpose;
-    public static Pose white1Pose = new Pose(13.5, 16.5, Math.toRadians(90));
-    public static Pose white2Pose = new Pose(25.5, 16.5, Math.toRadians(90));
-    public static Pose whitePose = white1Pose;
-    public static Pose crossPose = new Pose(55, 14, Math.toRadians(0));
-    public static Pose pickupPose = new Pose(30, 9, Math.toRadians(-90));
     private Servo claw;
     private Servo lift;
     private AlphaDisplay display;
@@ -52,7 +37,6 @@ public class RobofestMain extends LinearOpMode {
     public void runOpMode(){
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
-        follower.setStartingPose(startPose);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -63,24 +47,42 @@ public class RobofestMain extends LinearOpMode {
         TouchSensor button = hardwareMap.get(TouchSensor.class, "button");
         boolean oldPressed = false;
 
-//        PathChain box = follower.pathBuilder()
-//                .addPath(new BezierLine(new Point(startPose), new Point(boxPose)))
-//                .build();
-//        PathChain pickup = follower.pathBuilder()
-//                .addPath(new BezierLine(new Point(boxPose), new Point(pickupPose)))
-//                .build();
+        Pose startPoseEast = new Pose(5.5, 14, Math.toRadians(0));
+        Pose startPoseWest = new Pose(5.5, 14, Math.toRadians(180));
+        Pose startPoseNorth = new Pose(5.5, 14, Math.toRadians(90));
+        Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
+        Pose startPose = startPoseEast;
+
+        Pose boxBpose = new Pose (18.5, 12, Math.toRadians(-90));
+        Pose boxCpose = new Pose(30, 12, Math.toRadians(-90));
+        Pose stackPose = boxBpose;
+        Pose blackPose = boxCpose;
+        Pose white1Pose = new Pose(13.5, 17.5, Math.toRadians(90));
+        Pose white2Pose = new Pose(25.5, 17.5, Math.toRadians(90));
+        Pose whitePose = white1Pose;
+        Pose crossPose = new Pose(55, 14, Math.toRadians(0));
+        Pose pickupPose = new Pose(30, 9, Math.toRadians(-90));
+
+        follower.setStartingPose(startPose);
+
         PathChain whiteBox = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(startPose), new Point(whitePose)))
-                .setLinearHeadingInterpolation(startPose.getHeading(),whitePose.getHeading())
-                .build();
+            .addPath(new BezierLine(new Point(startPose), new Point(whitePose.getX(), whitePose.getY()-2)))
+            .setLinearHeadingInterpolation(startPose.getHeading(),whitePose.getHeading())
+            .addPath(new BezierLine(new Point(whitePose.getX(), whitePose.getY()-2), new Point(whitePose)))
+            .build();
         PathChain stack = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(whitePose), new Point (stackPose)))
-                .setLinearHeadingInterpolation(whitePose.getHeading(), stackPose.getHeading())
-                .build();
+            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose)))
+            .setLinearHeadingInterpolation(whitePose.getHeading(), stackPose.getHeading())
+            .build();
         PathChain back = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY() + 5)))
-                .setConstantHeadingInterpolation(stackPose.getHeading())
-                .build();
+            .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY() + 5)))
+            .setConstantHeadingInterpolation(stackPose.getHeading())
+            .build();
+        PathChain blackBox = follower.pathBuilder()
+            .addPath(new BezierLine(back.getPath(0).getLastControlPoint(), new Point(blackPose.getX(), blackPose.getY()+2)))
+            .setConstantHeadingInterpolation(blackPose.getHeading())
+            .addPath(new BezierLine(new Point(blackPose.getX(), blackPose.getY()+2), new Point(blackPose)))
+            .build();
 
 
         changeState(0);
@@ -94,7 +96,7 @@ public class RobofestMain extends LinearOpMode {
             boolean pressed = button.isPressed();
             if (pressed && !oldPressed) {
                 if (state == 0) {
-                    changeState(1);
+                    changeState(10);
                 } else {
                     changeState(0);
                 }
@@ -124,65 +126,81 @@ public class RobofestMain extends LinearOpMode {
                         closeClaw();
                     }
                     break;
-                case 1:
+                case 10:
                     if (enter) {
                         follower.followPath(whiteBox);
-                    }
-                    if (!follower.isBusy()) {
-                        changeState(2);
+                    } else if (!follower.isBusy()) {
+                        changeState(20);
                     }
                     break;
-                case 2:
+                case 20:
                     if (enter) {
                         liftDown();
-                    }
-                    if (stateTime.getElapsedTimeSeconds() > 4.6) {
-                        changeState(3);
+                    } else if (stateTime.getElapsedTimeSeconds() > 4.6) {
+                        changeState(30);
                     }
                     break;
-                case 3:
+                case 30:
                     if (enter) {
                         closeClaw();
-                    }
-                    if (stateTime.getElapsedTimeSeconds() > 1.4) {
-                        changeState(4);
+                    } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
+                        changeState(40);
                     }
                     break;
-                case 4:
+                case 40:
                     if (enter) {
                         liftUp();
-                    }
-                    if (stateTime.getElapsedTimeSeconds() > 3) {
-                        changeState(5);
+                    } else if (stateTime.getElapsedTimeSeconds() > 3) {
+                        changeState(50);
                     }
                     break;
-                case 5:
+                case 50:
                     if (enter) {
                         follower.followPath(stack);
-                    }
-                    if (!follower.isBusy()) {
-                        changeState(6);
+                    } else if (!follower.isBusy()) {
+                        changeState(60);
                     }
                     break;
-                case 6:
+                case 60:
                     if (stateTime.getElapsedTimeSeconds() > 1) {
-                        changeState(7);
+                        changeState(70);
                     }
-                case 7:
+                    break;
+                case 70:
                     if (enter) {
                         openClaw();
-                    }
-                    if (stateTime.getElapsedTimeSeconds() > 1.4) {
-                        changeState(8);
+                    }else if (stateTime.getElapsedTimeSeconds() > 1.4) {
+                        changeState(80);
                     }
                     break;
-                case 8:
+                case 80:
                     if (enter) {
                         follower.followPath(back);
+                    } else if (!follower.isBusy()) {
+                        changeState(90);
                     }
-                    if (!follower.isBusy()) {
-                        changeState(9);
+                    break;
+                case 90:
+                    if (enter) {
+                        follower.followPath(blackBox);
+                    } else if (!follower.isBusy()) {
+                        changeState(100);
                     }
+                    break;
+                case 100:
+                    if (enter) {
+                        liftDown();
+                    } else if (stateTime.getElapsedTimeSeconds() > 4.6) {
+                        changeState(110);
+                    }
+                    break;
+                case 110:
+                    if (enter) {
+                        closeClaw();
+                    } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
+                        changeState(120);
+                    }
+                    break;
             }
             oldPressed = pressed;
             telemetry.addData("state", state);
