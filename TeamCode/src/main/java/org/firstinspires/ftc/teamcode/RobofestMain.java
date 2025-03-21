@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
@@ -65,9 +66,10 @@ public class RobofestMain extends LinearOpMode {
         Pose whitePose = white1Pose;
         Pose crossPose = new Pose(55, 20, Math.toRadians(0));
         Pose pickupPose = new Pose(30, 9, Math.toRadians(-90));
-        Pose legoSouth = new Pose(55, 10, Math.toRadians(-90));
+        Pose legoSouth = new Pose(55, 11, Math.toRadians(-90));
         Pose legoNorth = new Pose(55, 19, Math.toRadians(90));
         Pose legoEast = new Pose(62, 16, Math.toRadians(0));
+        Pose medalPose = new Pose(64, 14, Math.toRadians(0));
 
         follower.setStartingPose(startPose);
 
@@ -102,6 +104,13 @@ public class RobofestMain extends LinearOpMode {
             .addPath(new BezierLine(new Point(legoEast), new Point(blackDropPose)))
             .setConstantHeadingInterpolation(blackDropPose.getHeading())
             .build();
+        PathChain medalPath = follower.pathBuilder()
+            .addPath(new BezierLine(new Point(blackDropPose), new Point(blackDropPose.getX()+5, blackDropPose.getY()-5)))
+            .setConstantHeadingInterpolation(blackDropPose.getHeading())
+            .addPath(new BezierLine(new Point(blackDropPose.getX()+5, blackDropPose.getY()-5), new Point(medalPose)))
+            .setConstantHeadingInterpolation(medalPose.getHeading())
+            .build();
+
 
         changeState(0);
 
@@ -147,14 +156,15 @@ public class RobofestMain extends LinearOpMode {
                 case 10:
                     if (enter) {
                         follower.followPath(whiteBox);
-                    } else if (!follower.isBusy()) {
+                    } else if (follower.atParametricEnd()) {
+                        follower.breakFollowing();
                         changeState(20);
                     }
                     break;
                 case 20:
                     if (enter) {
                         liftDown();
-                    } else if (stateTime.getElapsedTimeSeconds() > 3) {
+                    } else if (stateTime.getElapsedTimeSeconds() > 0.85) {
                         changeState(30);
                     }
                     break;
@@ -168,7 +178,7 @@ public class RobofestMain extends LinearOpMode {
                 case 40:
                     if (enter) {
                         liftUp();
-                    } else if (stateTime.getElapsedTimeSeconds() > 3) {
+                    } else if (stateTime.getElapsedTimeSeconds() > 1) {
                         changeState(50);
                     }
                     break;
@@ -194,21 +204,23 @@ public class RobofestMain extends LinearOpMode {
                 case 80:
                     if (enter) {
                         follower.followPath(back);
-                    } else if (!follower.isBusy()) {
+                    } else if (follower.atParametricEnd()) {
+                        follower.breakFollowing();
                         changeState(90);
                     }
                     break;
                 case 90:
                     if (enter) {
                         follower.followPath(blackBox);
-                    } else if (!follower.isBusy()) {
+                    } else if (follower.atParametricEnd()) {
+                        follower.breakFollowing();
                         changeState(100);
                     }
                     break;
                 case 100:
                     if (enter) {
                         liftDown();
-                    } else if (stateTime.getElapsedTimeSeconds() > 4.6) {
+                    } else if (stateTime.getElapsedTimeSeconds() > 1) {
                         changeState(110);
                     }
                     break;
@@ -223,10 +235,31 @@ public class RobofestMain extends LinearOpMode {
                     if (enter) {
                         follower.followPath(lego);
                     } else if (!follower.isBusy()) {
-                        changeState(130);
+                        changeState(140);
                     }
                     break;
-                case 130:
+                case 140:
+                    if (enter) {
+                        openClaw();
+                    } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
+                        changeState(150);
+                    }
+                    break;
+                case 150:
+                    if (enter) {
+                        follower.followPath(medalPath);
+                    } else if (!follower.isBusy()) {
+                        changeState(160);
+                    }
+                    break;
+                case 160:
+                    if (enter) {
+                        liftMedal();
+                    } else if (stateTime.getElapsedTimeSeconds() > 0.7) {
+                        changeState(170);
+                    }
+                    break;
+                case 170:
                     if (enter) {
                         follower.breakFollowing();
                     }
