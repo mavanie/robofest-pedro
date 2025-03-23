@@ -91,12 +91,10 @@ public class RobofestMain extends LinearOpMode {
             .addPath(new BezierLine(new Point(whitePose), new Point (stackPose)))
             .setLinearHeadingInterpolation(whitePose.getHeading(), stackPose.getHeading())
             .build();
-        PathChain back = follower.pathBuilder()
+        PathChain blackBox = follower.pathBuilder()
             .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY() + 6)))
             .setConstantHeadingInterpolation(stackPose.getHeading())
-            .build();
-        PathChain blackBox = follower.pathBuilder()
-            .addPath(new BezierLine(back.getPath(0).getLastControlPoint(), new Point(blackPose.getX(), blackPose.getY()+2)))
+            .addPath(new BezierLine(new Point(stackPose.getX(),stackPose.getY()), new Point(blackPose.getX(), blackPose.getY()+2)))
             .setConstantHeadingInterpolation(blackPose.getHeading())
             .addPath(new BezierLine(new Point(blackPose.getX(), blackPose.getY()+2), new Point(blackPose)))
             .build();
@@ -127,7 +125,7 @@ public class RobofestMain extends LinearOpMode {
             follower.update();
 
             boolean pressed = button.isPressed();
-            if (pressed && !oldPressed) {
+            if (pressed && !oldPressed && stateTime.getElapsedTime() > 0.2) {
                 if (state == 0) {
                     changeState(10);
                 } else {
@@ -207,14 +205,6 @@ public class RobofestMain extends LinearOpMode {
                     if (enter) {
                         openClaw();
                     }else if (stateTime.getElapsedTimeSeconds() > 1.4) {
-                        changeState(80);
-                    }
-                    break;
-                case 80:
-                    if (enter) {
-                        follower.followPath(back);
-                    } else if (follower.atParametricEnd()) {
-                        follower.breakFollowing();
                         changeState(90);
                     }
                     break;
