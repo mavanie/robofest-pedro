@@ -80,7 +80,7 @@ public class RobofestMain extends LinearOpMode {
         Pose crossPose = new Pose(55, 20, Math.toRadians(0));
         Pose legoSouth = new Pose(55, 11, Math.toRadians(-90));
         Pose legoEast = new Pose(62, 16, Math.toRadians(0));
-        Pose legoNorth = new Pose(55, 24.5, Math.toRadians(-90));
+        Pose legoNorth = new Pose(55, 19, Math.toRadians(90));
         Pose medalPose = new Pose(66, 17, Math.toRadians(0));
 
         follower.setStartingPose(startPose);
@@ -108,11 +108,14 @@ public class RobofestMain extends LinearOpMode {
             .addPath(new BezierLine(new Point(blackPose.getX(), blackPose.getY()+8), new Point(crossPose)))
             .setConstantHeadingInterpolation(blackPose.getHeading())
             .addPath(new BezierLine(new Point(crossPose), new Point(legoSouth)))
-            .addPath(new BezierLine(new Point(legoSouth), new Point(legoNorth)))
             .setConstantHeadingInterpolation(legoSouth.getHeading())
-            .addPath(new BezierLine(new Point(legoNorth), new Point(legoEast)))
+            .addPath(new BezierLine(new Point(legoSouth), new Point(crossPose)))
+            .setConstantHeadingInterpolation(legoSouth.getHeading())
+            .addPath(new BezierLine(new Point(crossPose), new Point(legoEast)))
             .setConstantHeadingInterpolation(legoEast.getHeading())
-            .addPath(new BezierLine(new Point(legoEast), new Point(blackDropPose)))
+            .addPath(new BezierLine(new Point(legoEast), new Point(legoNorth)))
+            .setConstantHeadingInterpolation(legoNorth.getHeading())
+            .addPath(new BezierLine(new Point(legoNorth), new Point(blackDropPose)))
             .setConstantHeadingInterpolation(blackDropPose.getHeading())
             .build();
         PathChain medalPath = follower.pathBuilder()
@@ -131,9 +134,7 @@ public class RobofestMain extends LinearOpMode {
             .addPath(new BezierLine(new Point(medalDropPose), new Point(medalDropPose.getX()+2, medalDropPose.getY()-2)))
             .setConstantHeadingInterpolation(medalDropPose.getHeading())
             .addPath(new BezierLine(new Point(medalDropPose.getX()+2, medalDropPose.getY()-2), new Point(crossPose)))
-
             .build();
-
 
         changeState(0);
 
@@ -213,7 +214,7 @@ public class RobofestMain extends LinearOpMode {
                     }
                     break;
                 case 60:
-                    if (stateTime.getElapsedTimeSeconds() > 1) {
+                    if (stateTime.getElapsedTimeSeconds() > 0.4) {
                         changeState(70);
                     }
                     break;
