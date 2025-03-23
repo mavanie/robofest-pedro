@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
@@ -60,8 +61,8 @@ public class RobofestMain extends LinearOpMode {
         //noinspection UnnecessaryLocalVariable
         Pose startPose = startPoseEast;
 
-        Pose boxBpose = new Pose (19.5, 12, Math.toRadians(-90));
-        Pose boxCpose = new Pose(31.5, 12, Math.toRadians(-90));
+        Pose boxBpose = new Pose (19.5, 11.5, Math.toRadians(-90));
+        Pose boxCpose = new Pose(31.5, 11.5, Math.toRadians(-90));
         //noinspection UnnecessaryLocalVariable
         Pose stackPose = boxBpose;
         //noinspection UnnecessaryLocalVariable
@@ -71,14 +72,16 @@ public class RobofestMain extends LinearOpMode {
         Pose white1Pose = new Pose(13.5, 17.5, Math.toRadians(90));
         //noinspection unused
         Pose white2Pose = new Pose(25.5, 17.5, Math.toRadians(90));
-        Pose blackDropPose = new Pose(43,19 , Math.toRadians(135));
+        Pose blackDropPose = new Pose(43,18.5 , Math.toRadians(135));
+        Pose medalDropPose = new Pose(42, 17.5, Math.toRadians(135));
         //noinspection UnnecessaryLocalVariable
         Pose whitePose = white1Pose;
 
         Pose crossPose = new Pose(55, 20, Math.toRadians(0));
         Pose legoSouth = new Pose(55, 11, Math.toRadians(-90));
         Pose legoEast = new Pose(62, 16, Math.toRadians(0));
-        Pose medalPose = new Pose(64, 14, Math.toRadians(0));
+        Pose legoNorth = new Pose(55, 24.5, Math.toRadians(-90));
+        Pose medalPose = new Pose(66, 17, Math.toRadians(0));
 
         follower.setStartingPose(startPose);
 
@@ -88,8 +91,9 @@ public class RobofestMain extends LinearOpMode {
             .addPath(new BezierLine(new Point(whitePose.getX(), whitePose.getY()-2), new Point(whitePose)))
             .build();
         PathChain stack = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose)))
+            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
             .setLinearHeadingInterpolation(whitePose.getHeading(), stackPose.getHeading())
+            .addPath(new BezierLine(new Point(stackPose.getX(), stackPose.getY()+3), new Point(stackPose)))
             .build();
         PathChain blackBox = follower.pathBuilder()
             .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY() + 6)))
@@ -104,18 +108,30 @@ public class RobofestMain extends LinearOpMode {
             .addPath(new BezierLine(new Point(blackPose.getX(), blackPose.getY()+8), new Point(crossPose)))
             .setConstantHeadingInterpolation(blackPose.getHeading())
             .addPath(new BezierLine(new Point(crossPose), new Point(legoSouth)))
-            .addPath(new BezierLine(new Point(legoSouth), new Point(crossPose.getX(), crossPose.getY()+6)))
+            .addPath(new BezierLine(new Point(legoSouth), new Point(legoNorth)))
             .setConstantHeadingInterpolation(legoSouth.getHeading())
-            .addPath(new BezierLine(new Point(crossPose), new Point(legoEast)))
+            .addPath(new BezierLine(new Point(legoNorth), new Point(legoEast)))
             .setConstantHeadingInterpolation(legoEast.getHeading())
             .addPath(new BezierLine(new Point(legoEast), new Point(blackDropPose)))
             .setConstantHeadingInterpolation(blackDropPose.getHeading())
             .build();
         PathChain medalPath = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(blackDropPose), new Point(blackDropPose.getX()+5, blackDropPose.getY()-5)))
+            .addPath(new BezierLine(new Point(blackDropPose), new Point(blackDropPose.getX()+3, blackDropPose.getY()-3)))
             .setConstantHeadingInterpolation(blackDropPose.getHeading())
-            .addPath(new BezierLine(new Point(blackDropPose.getX()+5, blackDropPose.getY()-5), new Point(medalPose)))
+            .addPath(new BezierLine(new Point(blackDropPose.getX()+3, blackDropPose.getY()-3), new Point(medalPose)))
             .setConstantHeadingInterpolation(medalPose.getHeading())
+            .build();
+        PathChain medalDropPath = follower.pathBuilder()
+            .addPath(new BezierLine(new Point(medalPose), new Point(medalPose.getX()-4, medalPose.getY())))
+            .setConstantHeadingInterpolation(medalPose.getHeading())
+            .addPath(new BezierLine(new Point(medalPose.getX()-4, medalPose.getY()), new Point(medalDropPose)))
+            .setConstantHeadingInterpolation(medalDropPose.getHeading())
+            .build();
+        PathChain endGame = follower.pathBuilder()
+            .addPath(new BezierLine(new Point(medalDropPose), new Point(medalDropPose.getX()+2, medalDropPose.getY()-2)))
+            .setConstantHeadingInterpolation(medalDropPose.getHeading())
+            .addPath(new BezierLine(new Point(medalDropPose.getX()+2, medalDropPose.getY()-2), new Point(crossPose)))
+
             .build();
 
 
@@ -125,7 +141,7 @@ public class RobofestMain extends LinearOpMode {
             follower.update();
 
             boolean pressed = button.isPressed();
-            if (pressed && !oldPressed && stateTime.getElapsedTime() > 0.2) {
+            if (pressed && !oldPressed && stateTime.getElapsedTimeSeconds() > 0.2) {
                 if (state == 0) {
                     changeState(10);
                 } else {
@@ -259,6 +275,27 @@ public class RobofestMain extends LinearOpMode {
                     }
                     break;
                 case 170:
+                    if (enter) {
+                       follower.followPath(medalDropPath);
+                    } else if (follower.atParametricEnd()) {
+                        changeState(180);
+                    }
+                    break;
+                case 180:
+                    if (enter) {
+                        liftDown();
+                    } else if (stateTime.getElapsedTimeSeconds() > 0.7) {
+                        changeState(190);
+                    }
+                    break;
+                case 190:
+                    if (enter) {
+                        follower.followPath(endGame);
+                    } else if (follower.atParametricEnd()) {
+                        changeState(200);
+                    }
+                    break;
+                case 200:
                     if (enter) {
                         follower.breakFollowing();
                     }
