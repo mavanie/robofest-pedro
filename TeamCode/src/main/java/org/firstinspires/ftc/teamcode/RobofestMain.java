@@ -59,10 +59,15 @@ public class RobofestMain extends LinearOpMode {
         Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
         //noinspection UnnecessaryLocalVariable
         Pose startPose = startPoseEast;
+        //noinspection unused
         Pose boxApose = new Pose (8,11.5, Math.toRadians(-90));
+        //noinspection unused
         Pose boxBpose = new Pose (19.5, 11.5, Math.toRadians(-90));
+        //noinspection unused
         Pose boxCpose = new Pose(31.5, 11.5, Math.toRadians(-90));
+        //noinspection unused
         Pose boxDpose = new Pose (43,11.5, Math.toRadians(-90));
+        //noinspection unused
         Pose boxEpose = new Pose (66,11.5, Math.toRadians(-90));
         //noinspection UnnecessaryLocalVariable
         Pose stackPose = boxDpose;
