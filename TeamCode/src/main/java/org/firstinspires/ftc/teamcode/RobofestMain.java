@@ -59,10 +59,10 @@ public class RobofestMain extends LinearOpMode {
         Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
         //noinspection UnnecessaryLocalVariable
         Pose startPose = startPoseEast;
-        Pose boxApose = new Pose (7,11.5, Math.toRadians(-90));
+        Pose boxApose = new Pose (8,11.5, Math.toRadians(-90));
         Pose boxBpose = new Pose (19.5, 11.5, Math.toRadians(-90));
         Pose boxCpose = new Pose(31.5, 11.5, Math.toRadians(-90));
-        Pose boxDpose = new Pose (42,11.5, Math.toRadians(-90));
+        Pose boxDpose = new Pose (43,11.5, Math.toRadians(-90));
         Pose boxEpose = new Pose (66,11.5, Math.toRadians(-90));
         //noinspection UnnecessaryLocalVariable
         Pose stackPose = boxDpose;
@@ -92,13 +92,13 @@ public class RobofestMain extends LinearOpMode {
             .build();
         PathChain stack = follower.pathBuilder()
             .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
-            .setLinearHeadingInterpolation(whitePose.getHeading(), stackPose.getHeading())
+            .setConstantHeadingInterpolation(stackPose.getHeading())
             .addPath(new BezierLine(new Point(stackPose.getX(), stackPose.getY()+3), new Point(stackPose)))
             .build();
         PathChain blackBox = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY() + 6)))
+            .addPath(new BezierLine(new Point(stackPose), new Point(stackPose.getX(), stackPose.getY()+4)))
             .setConstantHeadingInterpolation(stackPose.getHeading())
-            .addPath(new BezierLine(new Point(stackPose.getX(),stackPose.getY()), new Point(blackPose.getX(), blackPose.getY()+2)))
+            .addPath(new BezierLine(new Point(stackPose.getX(),stackPose.getY()+4), new Point(blackPose.getX(), blackPose.getY()+2)))
             .setConstantHeadingInterpolation(blackPose.getHeading())
             .addPath(new BezierLine(new Point(blackPose.getX(), blackPose.getY()+2), new Point(blackPose)))
             .build();
