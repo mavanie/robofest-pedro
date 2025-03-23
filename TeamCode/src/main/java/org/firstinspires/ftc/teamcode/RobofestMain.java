@@ -60,17 +60,17 @@ public class RobofestMain extends LinearOpMode {
         //noinspection UnnecessaryLocalVariable
         Pose startPose = startPoseEast;
         //noinspection unused
-        Pose boxApose = new Pose (8,11.5, Math.toRadians(-90));
+        Pose boxApose = new Pose (8,12, Math.toRadians(-90));
         //noinspection unused
-        Pose boxBpose = new Pose (19.5, 11.5, Math.toRadians(-90));
+        Pose boxBpose = new Pose (19.5, 12, Math.toRadians(-90));
         //noinspection unused
-        Pose boxCpose = new Pose(31.5, 11.5, Math.toRadians(-90));
+        Pose boxCpose = new Pose(31.5, 12, Math.toRadians(-90));
         //noinspection unused
-        Pose boxDpose = new Pose (43,11.5, Math.toRadians(-90));
+        Pose boxDpose = new Pose (43,12, Math.toRadians(-90));
         //noinspection unused
-        Pose boxEpose = new Pose (66,11.5, Math.toRadians(-90));
+        Pose boxEpose = new Pose (66,12, Math.toRadians(-90));
         //noinspection UnnecessaryLocalVariable
-        Pose stackPose = boxDpose;
+        Pose stackPose = boxCpose;
         Pose blackPose = new Pose(boxApose.getX(), boxApose.getY()-1, boxApose.getHeading());
 
         //noinspection unused
@@ -86,7 +86,7 @@ public class RobofestMain extends LinearOpMode {
         Pose legoSouth = new Pose(55, 11, Math.toRadians(-90));
         Pose legoEast = new Pose(62, 16, Math.toRadians(0));
         Pose legoNorth = new Pose(55, 19, Math.toRadians(90));
-        Pose medalPose = new Pose(66, 17, Math.toRadians(0));
+        Pose medalPose = new Pose(66, 14, Math.toRadians(0));
 
         follower.setStartingPose(startPose);
 
@@ -139,6 +139,8 @@ public class RobofestMain extends LinearOpMode {
             .addPath(new BezierLine(new Point(medalDropPose), new Point(medalDropPose.getX()+2, medalDropPose.getY()-2)))
             .setConstantHeadingInterpolation(medalDropPose.getHeading())
             .addPath(new BezierLine(new Point(medalDropPose.getX()+2, medalDropPose.getY()-2), new Point(crossPose)))
+            .addPath(new BezierLine(new Point(crossPose), new Point(68, 23)))
+            .setConstantHeadingInterpolation(0)
             .build();
 
         changeState(0);
@@ -303,6 +305,12 @@ public class RobofestMain extends LinearOpMode {
                     break;
                 case 200:
                     if (enter) {
+                        display.writeNumber(3);
+                    } else {
+                        changeState(210);
+                    }
+                case 210:
+                    if (enter) {
                         follower.breakFollowing();
                     }
                     break;
@@ -347,7 +355,7 @@ public class RobofestMain extends LinearOpMode {
 
     private void changeState(int newState) {
         stateTime.resetTimer();
-        display.writeNumber(newState);
+//        display.writeNumber(newState);
         display.updateDisplay();
         oldState = state;
         state = newState;
