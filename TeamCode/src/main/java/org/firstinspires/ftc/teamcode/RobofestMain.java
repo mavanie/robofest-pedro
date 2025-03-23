@@ -4,9 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
@@ -22,6 +20,7 @@ import pedroPathing.constants.LConstants;
 @TeleOp
 @Config
 public class RobofestMain extends LinearOpMode {
+    /** @noinspection FieldCanBeLocal*/
     private Follower follower;
     private Servo claw;
     private Servo lift;
@@ -32,7 +31,7 @@ public class RobofestMain extends LinearOpMode {
     public static double LIFT_START = 0.4;
     public static double CLAW_OPEN = 1;
     public static double CLAW_CLOSED = 0;
-    private Timer stateTime = new Timer();
+    private final Timer stateTime = new Timer();
     private int state = -1;
     private int oldState = -1;
     @Override
@@ -50,24 +49,34 @@ public class RobofestMain extends LinearOpMode {
         TouchSensor button = hardwareMap.get(TouchSensor.class, "button");
         boolean oldPressed = false;
 
+        //noinspection unused
         Pose startPoseEast = new Pose(5.5, 14, Math.toRadians(0));
+        //noinspection unused
         Pose startPoseWest = new Pose(5.5, 14, Math.toRadians(180));
+        //noinspection unused
         Pose startPoseNorth = new Pose(5.5, 14, Math.toRadians(90));
+        //noinspection unused
         Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
+        //noinspection UnnecessaryLocalVariable
         Pose startPose = startPoseEast;
 
         Pose boxBpose = new Pose (19.5, 12, Math.toRadians(-90));
         Pose boxCpose = new Pose(31.5, 12, Math.toRadians(-90));
+        //noinspection UnnecessaryLocalVariable
         Pose stackPose = boxBpose;
+        //noinspection UnnecessaryLocalVariable
         Pose blackPose = boxCpose;
+
+        //noinspection unused
         Pose white1Pose = new Pose(13.5, 17.5, Math.toRadians(90));
+        //noinspection unused
         Pose white2Pose = new Pose(25.5, 17.5, Math.toRadians(90));
         Pose blackDropPose = new Pose(43,19 , Math.toRadians(135));
+        //noinspection UnnecessaryLocalVariable
         Pose whitePose = white1Pose;
+
         Pose crossPose = new Pose(55, 20, Math.toRadians(0));
-        Pose pickupPose = new Pose(30, 9, Math.toRadians(-90));
         Pose legoSouth = new Pose(55, 11, Math.toRadians(-90));
-        Pose legoNorth = new Pose(55, 19, Math.toRadians(90));
         Pose legoEast = new Pose(62, 16, Math.toRadians(0));
         Pose medalPose = new Pose(64, 14, Math.toRadians(0));
 
