@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
@@ -60,13 +59,14 @@ public class RobofestMain extends LinearOpMode {
         Pose startPoseSouth = new Pose(5.5, 14, Math.toRadians(-90));
         //noinspection UnnecessaryLocalVariable
         Pose startPose = startPoseEast;
-
+        Pose boxApose = new Pose (7,11.5, Math.toRadians(-90));
         Pose boxBpose = new Pose (19.5, 11.5, Math.toRadians(-90));
         Pose boxCpose = new Pose(31.5, 11.5, Math.toRadians(-90));
+        Pose boxDpose = new Pose (42,11.5, Math.toRadians(-90));
+        Pose boxEpose = new Pose (66,11.5, Math.toRadians(-90));
         //noinspection UnnecessaryLocalVariable
-        Pose stackPose = boxBpose;
-        //noinspection UnnecessaryLocalVariable
-        Pose blackPose = boxCpose;
+        Pose stackPose = boxDpose;
+        Pose blackPose = new Pose(boxApose.getX(), boxApose.getY()-1, boxApose.getHeading());
 
         //noinspection unused
         Pose white1Pose = new Pose(13.5, 17.5, Math.toRadians(90));
