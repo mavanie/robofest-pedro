@@ -8,7 +8,7 @@ public class FConstants {
     static {
         FollowerConstants.localizers = Localizers.TWO_WHEEL;
 
-        FollowerConstants.automaticHoldEnd = true; // Can be set to false to not hold position at the end of movement by default
+        FollowerConstants.automaticHoldEnd = false; // don't move when follower.isBusy = false
 
         FollowerConstants.leftFrontMotorName = "frontLeft";
         FollowerConstants.leftRearMotorName = "backLeft";

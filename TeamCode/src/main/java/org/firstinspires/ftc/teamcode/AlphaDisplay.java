@@ -159,6 +159,7 @@ public class AlphaDisplay extends I2cDeviceSynchDevice<I2cDeviceSynch>{
         writeCharacter((char) ('0' + hundreds), 1, false);
         int thousands = (number / 1000) % 10;
         writeCharacter((char) ('0' + thousands), 0, false);
+        updateDisplay();
     }
 
     @Override
