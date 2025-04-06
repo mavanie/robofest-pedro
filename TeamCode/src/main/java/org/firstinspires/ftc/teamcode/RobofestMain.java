@@ -66,7 +66,7 @@ public class RobofestMain extends LinearOpMode {
         //noinspection unused
         Pose boxDpose = new Pose (43,12, Math.toRadians(-90));
         //noinspection unused
-        Pose boxEpose = new Pose (66,12, Math.toRadians(-90));
+        Pose boxEpose = new Pose (65.5,11.5, Math.toRadians(-80));
 
         //noinspection unused
         Pose white1Pose = new Pose(13.5, 17.5, Math.toRadians(90));
@@ -90,7 +90,8 @@ public class RobofestMain extends LinearOpMode {
         //noinspection UnnecessaryLocalVariable
         Pose whitePose = white2Pose;
         Pose stackPose = new Pose(boxCpose.getX(), boxCpose.getY()+0.5, boxCpose.getHeading());
-        Pose blackPose = new Pose(boxBpose.getX(), boxBpose.getY()-1, boxBpose.getHeading());
+        Pose blackPose = new Pose(boxEpose.getX(), boxEpose.getY()-1, boxEpose.getHeading());
+//        Uncomment lines in white box if back box is E
 
         follower.setStartingPose(startPose);
 
@@ -101,6 +102,13 @@ public class RobofestMain extends LinearOpMode {
             .setPathEndTimeoutConstraint(0)
             .build();
         PathChain stack = follower.pathBuilder()
+//            Next 5 lines for black box E only
+            .addPath(new BezierLine(new Point(whitePose), new Point(legoEast.getX()-1, legoEast.getY())))
+            .addPath(new BezierLine(new Point(legoEast.getX()-1, legoEast.getY()), new Point(crossPose)))
+            .setConstantHeadingInterpolation(legoEast.getHeading())
+            .addPath(new BezierLine(new Point(crossPose), new Point(whitePose)))
+            .addParametricCallback(0.5, this::liftUp)
+
             .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
             .setConstantHeadingInterpolation(stackPose.getHeading())
             .addPath(new BezierLine(new Point(stackPose.getX(), stackPose.getY()+3), new Point(stackPose)))
@@ -228,7 +236,8 @@ public class RobofestMain extends LinearOpMode {
                     if (enter) {
                         closeClaw();
                     } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
-                        changeState(40);
+                        // If black box E, go to state 50, otherwise 40
+                        changeState(50);
                     }
                     break;
                 case 40:
