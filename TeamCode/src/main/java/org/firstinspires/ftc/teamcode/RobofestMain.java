@@ -91,7 +91,7 @@ public class RobofestMain extends LinearOpMode {
         Pose whitePose = white2Pose;
         Pose stackPose = new Pose(boxCpose.getX(), boxCpose.getY()+0.5, boxCpose.getHeading());
         Pose blackPose = new Pose(boxEpose.getX(), boxEpose.getY()-1, boxEpose.getHeading());
-//        Uncomment lines in white box if back box is E
+//        Uncomment lines in white box if back box is E. Also change case 30.
 
         follower.setStartingPose(startPose);
 
@@ -158,11 +158,12 @@ public class RobofestMain extends LinearOpMode {
         PathChain endGame = follower.pathBuilder()
             .addPath(new BezierLine(new Point(medalDropPose), new Point(medalDropPose.getX()+4, medalDropPose.getY())))
             .setConstantHeadingInterpolation(medalDropPose.getHeading())
-            .addPath(new BezierLine(new Point(medalDropPose.getX()+4, medalDropPose.getY()), new Point(crossPose)))
+            .addPath(new BezierLine(new Point(medalDropPose.getX()+4, medalDropPose.getY()), new Point(55, 13)))
             .setConstantHeadingInterpolation(medalDropPose.getHeading())
             .addParametricCallback(1, this::liftStart)
-            .addPath(new BezierLine(new Point(crossPose), new Point(medalPose.getX()+1, medalPose.getY())))
-            .setConstantHeadingInterpolation(0)
+            .addPath(new BezierLine(new Point(55, 13), new Point(startPoseWest.getX(), 13)))
+//            .addPath(new BezierLine(new Point(crossPose), new Point(medalPose.getX()+1, medalPose.getY())))
+//            .setConstantHeadingInterpolation(0)
             .setPathEndTimeoutConstraint(0)
             .build();
 
