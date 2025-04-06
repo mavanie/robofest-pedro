@@ -54,9 +54,9 @@ public class RobofestMain extends LinearOpMode {
         //noinspection unused
         Pose startPoseWest = new Pose(5.5, 14, Math.toRadians(180));
         //noinspection unused
-        Pose startPoseNorth = new Pose( 5.5, 13, Math.toRadians(90));
+        Pose startPoseNorth = new Pose( 6.5, 15, Math.toRadians(90));
         //noinspection unused
-        Pose startPoseSouth = new Pose(4.5, 15, Math.toRadians(-90));
+        Pose startPoseSouth = new Pose(5.5, 15.5, Math.toRadians(-90));
         //noinspection unused
         Pose boxApose = new Pose (8,12, Math.toRadians(-90));
         //noinspection unused
@@ -73,7 +73,7 @@ public class RobofestMain extends LinearOpMode {
         //noinspection unused
         Pose white2Pose = new Pose(25.5, 17.5, Math.toRadians(90));
         Pose blackDropPose = new Pose(47,23, Math.toRadians(180));
-        Pose medalDropPose = new Pose(48,19, Math.toRadians(180));
+        Pose medalDropPose = new Pose(50,20, Math.toRadians(180));
 
         Pose crossPose = new Pose(55, 20, Math.toRadians(0));
         Pose legoSouth = new Pose(55, 11, Math.toRadians(-90));
@@ -86,11 +86,10 @@ public class RobofestMain extends LinearOpMode {
         // ==================================
 
         //noinspection UnnecessaryLocalVariable
-        Pose startPose = startPoseEast;
+        Pose startPose = startPoseWest;
         //noinspection UnnecessaryLocalVariable
         Pose whitePose = white2Pose;
-        //noinspection UnnecessaryLocalVariable
-        Pose stackPose = boxCpose;
+        Pose stackPose = new Pose(boxCpose.getX(), boxCpose.getY()+0.5, boxCpose.getHeading());
         Pose blackPose = new Pose(boxBpose.getX(), boxBpose.getY()-1, boxBpose.getHeading());
 
         follower.setStartingPose(startPose);
@@ -153,6 +152,7 @@ public class RobofestMain extends LinearOpMode {
             .setConstantHeadingInterpolation(medalDropPose.getHeading())
             .addPath(new BezierLine(new Point(medalDropPose.getX()+4, medalDropPose.getY()), new Point(crossPose)))
             .setConstantHeadingInterpolation(medalDropPose.getHeading())
+            .addParametricCallback(1, this::liftStart)
             .addPath(new BezierLine(new Point(crossPose), new Point(medalPose.getX()+1, medalPose.getY())))
             .setConstantHeadingInterpolation(0)
             .setPathEndTimeoutConstraint(0)
