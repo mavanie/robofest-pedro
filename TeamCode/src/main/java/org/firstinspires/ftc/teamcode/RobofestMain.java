@@ -89,29 +89,30 @@ public class RobofestMain extends LinearOpMode {
         //noinspection UnnecessaryLocalVariable
         Pose startPose = startPoseWest;
         //noinspection UnnecessaryLocalVariable
-        Pose whitePose = white1Pose;
+        Pose whitePose = white2Pose;
         Pose stackPose = new Pose(boxCpose.getX(), boxCpose.getY(), boxCpose.getHeading());
-        Pose blackPose = new Pose(boxBpose.getX(), boxBpose.getY()-1, boxBpose.getHeading());
+        Pose blackPose = new Pose(boxEpose.getX(), boxBpose.getY()-1, boxEpose.getHeading());
 //        Uncomment lines in white box if back box is E. Also change case 30.
 
         follower.setStartingPose(startPose);
 
         PathChain whiteBox = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(startPose), new Point(whitePose.getX(), whitePose.getY()-2)))
+            .addPath(new BezierLine(new Point(startPose), new Point(whitePose.getX(), whitePose.getY()-3)))
             .setLinearHeadingInterpolation(startPose.getHeading(),whitePose.getHeading())
-            .addPath(new BezierLine(new Point(whitePose.getX(), whitePose.getY()-2), new Point(whitePose)))
+            .addPath(new BezierLine(new Point(whitePose.getX(), whitePose.getY()-3), new Point(whitePose)))
             .setPathEndTimeoutConstraint(0)
             .build();
         PathChain stack = follower.pathBuilder()
-//            Next 5 lines for black box E only
-//            .addPath(new BezierLine(new Point(whitePose), new Point(legoEast.getX()-1, legoEast.getY())))
-//            .addPath(new BezierLine(new Point(legoEast.getX()-1, legoEast.getY()), new Point(crossPose)))
-//            .setConstantHeadingInterpolation(legoEast.getHeading())
-//            .addPath(new BezierLine(new Point(crossPose), new Point(whitePose)))
-//            .addParametricCallback(0.5, this::liftUp)
-
-            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
+//            Next 6 lines for black box E only
+            .addPath(new BezierLine(new Point(whitePose), new Point(legoEast.getX()-1, legoEast.getY())))
+            .addPath(new BezierLine(new Point(legoEast.getX()-1, legoEast.getY()), new Point(crossPose)))
+            .setConstantHeadingInterpolation(legoEast.getHeading())
+            .addPath(new BezierLine(new Point(crossPose), new Point(stackPose.getX(), stackPose.getY()+3)))
             .setConstantHeadingInterpolation(stackPose.getHeading())
+            .addParametricCallback(0, this::liftUp)
+//           Comment out next 2 lines for black box E
+//            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
+//            .setConstantHeadingInterpolation(stackPose.getHeading())
             .addPath(new BezierLine(new Point(stackPose.getX(), stackPose.getY()+3), new Point(stackPose)))
             .setPathEndTimeoutConstraint(0)
             .build();
@@ -240,7 +241,7 @@ public class RobofestMain extends LinearOpMode {
                         closeClaw();
                     } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
                         // If black box E, go to state 50, otherwise 40
-                        changeState(40);
+                        changeState(50);
                     }
                     break;
                 case 40:
@@ -258,7 +259,7 @@ public class RobofestMain extends LinearOpMode {
                     }
                     break;
                 case 60:
-                    if (stateTime.getElapsedTimeSeconds() > 0.4) {
+                    if (stateTime.getElapsedTimeSeconds() > 0.2) {
                         changeState(65);
                     }
                     break;
@@ -272,7 +273,7 @@ public class RobofestMain extends LinearOpMode {
                 case 70:
                     if (enter) {
                         openClaw();
-                    } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
+                    } else if (stateTime.getElapsedTimeSeconds() > 1) {
                         changeState(90);
                     }
                     break;
