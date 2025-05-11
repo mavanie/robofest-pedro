@@ -29,6 +29,7 @@ public class RobofestMain extends LinearOpMode {
     public static double LIFT_UP = 0.6;
     public static double LIFT_MEDAL = 0.3;
     public static double LIFT_START = 0.4;
+    public static double LIFT_DROP = 0.4;
     public static double CLAW_OPEN = 1;
     public static double CLAW_CLOSED = 0;
     private final Timer stateTime = new Timer();
@@ -258,13 +259,20 @@ public class RobofestMain extends LinearOpMode {
                     break;
                 case 60:
                     if (stateTime.getElapsedTimeSeconds() > 0.4) {
+                        changeState(65);
+                    }
+                    break;
+                case 65:
+                    if (enter) {
+                        liftDrop();
+                    } else if (stateTime.getElapsedTimeSeconds() > 0.5) {
                         changeState(70);
                     }
                     break;
                 case 70:
                     if (enter) {
                         openClaw();
-                    }else if (stateTime.getElapsedTimeSeconds() > 1.4) {
+                    } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
                         changeState(90);
                     }
                     break;
@@ -373,8 +381,11 @@ public class RobofestMain extends LinearOpMode {
     private void liftDown() {
         lift.setPosition(LIFT_DOWN);
     }
+    private void liftDrop() {
+        lift.setPosition(LIFT_DROP);
+    }
 
-    private  void liftMedal() {
+    private void liftMedal() {
         lift.setPosition(LIFT_MEDAL);
     }
 
