@@ -34,6 +34,7 @@ public class RobofestMain extends LinearOpMode {
     public static double CLAW_CLOSED = 0;
     private final Timer stateTime = new Timer();
     private int state = -1;
+    private int end = 1;
     private int oldState = -1;
     @Override
     public void runOpMode(){
@@ -63,24 +64,24 @@ public class RobofestMain extends LinearOpMode {
         //noinspection unused
         Pose boxBpose = new Pose (20, 12, Math.toRadians(-90));
         //noinspection unused
-        Pose boxCpose = new Pose(32, 12, Math.toRadians(-90));
+        Pose boxCpose = new Pose(30.5, 12, Math.toRadians(-90));
         //noinspection unused
         Pose boxDpose = new Pose (43,12, Math.toRadians(-90));
         //noinspection unused
-        Pose boxEpose = new Pose (65.25,11.25, Math.toRadians(-80));
+        Pose boxEpose = new Pose (66.25,11.25, Math.toRadians(-80));
 
         //noinspection unused
         Pose white1Pose = new Pose(13, 17.5, Math.toRadians(90));
         //noinspection unused
         Pose white2Pose = new Pose(25, 17.5, Math.toRadians(90));
-        Pose blackDropPose = new Pose(47.5,24, Math.toRadians(180));
-        Pose medalDropPose = new Pose(50,22.5, Math.toRadians(180));
+        Pose blackDropPose = new Pose(47.75,23, Math.toRadians(180));
+        Pose medalDropPose = new Pose(49,23, Math.toRadians(180));
 
         Pose crossPose = new Pose(55, 20, Math.toRadians(0));
         Pose legoSouth = new Pose(55, 11, Math.toRadians(-90));
         Pose legoEast = new Pose(62, 16, Math.toRadians(0));
         Pose legoNorth = new Pose(55, 19, Math.toRadians(90));
-        Pose medalPose = new Pose(66, 15.7, Math.toRadians(0));
+        Pose medalPose = new Pose(65.25, 15, Math.toRadians(0));
 
         // ==================================
         // CHANGE THIS STUFF!
@@ -89,10 +90,10 @@ public class RobofestMain extends LinearOpMode {
         //noinspection UnnecessaryLocalVariable
         Pose startPose = startPoseWest;
         //noinspection UnnecessaryLocalVariable
-        Pose whitePose = white2Pose;
-        Pose stackPose = new Pose(boxCpose.getX(), boxCpose.getY(), boxCpose.getHeading());
-        Pose blackPose = new Pose(boxEpose.getX(), boxBpose.getY()-1, boxEpose.getHeading());
-//        Uncomment lines in white box if back box is E. Also change case 30.
+        Pose whitePose = white1Pose;
+        Pose stackPose = new Pose(boxBpose.getX(), boxBpose.getY(), boxBpose.getHeading());
+        Pose blackPose = new Pose(boxCpose.getX(), boxCpose.getY()-1, boxCpose.getHeading());
+//        Uncomment lines in white box if black box is E. Also change case 30.
 
         follower.setStartingPose(startPose);
 
@@ -104,15 +105,15 @@ public class RobofestMain extends LinearOpMode {
             .build();
         PathChain stack = follower.pathBuilder()
 //            Next 6 lines for black box E only
-            .addPath(new BezierLine(new Point(whitePose), new Point(legoEast.getX()-1, legoEast.getY())))
-            .addPath(new BezierLine(new Point(legoEast.getX()-1, legoEast.getY()), new Point(crossPose)))
-            .setConstantHeadingInterpolation(legoEast.getHeading())
-            .addPath(new BezierLine(new Point(crossPose), new Point(stackPose.getX(), stackPose.getY()+3)))
-            .setConstantHeadingInterpolation(stackPose.getHeading())
-            .addParametricCallback(0, this::liftUp)
-//           Comment out next 2 lines for black box E
-//            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
+//            .addPath(new BezierLine(new Point(whitePose), new Point(legoEast.getX()-1, legoEast.getY())))
+//            .addPath(new BezierLine(new Point(legoEast.getX()-1, legoEast.getY()), new Point(crossPose)))
+//            .setConstantHeadingInterpolation(legoEast.getHeading())
+//            .addPath(new BezierLine(new Point(crossPose), new Point(stackPose.getX(), stackPose.getY()+3)))
 //            .setConstantHeadingInterpolation(stackPose.getHeading())
+//            .addParametricCallback(0, this::liftUp)
+//           Comment out next 2 lines for black box E
+            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
+            .setConstantHeadingInterpolation(stackPose.getHeading())
             .addPath(new BezierLine(new Point(stackPose.getX(), stackPose.getY()+3), new Point(stackPose)))
             .setPathEndTimeoutConstraint(0)
             .build();
@@ -163,7 +164,9 @@ public class RobofestMain extends LinearOpMode {
             .addParametricCallback(1, this::liftStart)
             .addPath(new BezierLine(new Point(medalDropPose.getX()+4, medalDropPose.getY()), new Point(55, 15)))
             .setConstantHeadingInterpolation(medalDropPose.getHeading())
-            .addPath(new BezierLine(new Point(55, 15), new Point(startPoseWest)))
+                .addPath(new BezierLine(new Point(55, 15), new Point(medalPose)))
+            .setConstantHeadingInterpolation(medalPose.getHeading())
+            .addPath(new BezierLine(new Point(medalPose), new Point(medalPose.getX()+3, medalPose.getY())))
 //            .addPath(new BezierLine(new Point(55, 13), new Point(startPoseWest.getX(), 13)))
 //            .addPath(new BezierLine(new Point(crossPose), new Point(medalPose.getX()+1, medalPose.getY())))
 //            .setConstantHeadingInterpolation(0)
@@ -181,7 +184,7 @@ public class RobofestMain extends LinearOpMode {
 //                    display.writeNumber(3);
                         display.writeCharacter(' ', 0, false);
                         display.writeCharacter('6', 1, false);
-                        display.writeCharacter('0', 2, false);
+                        display.writeCharacter('3', 2, false);
                         display.writeCharacter('0', 3, false);
                         display.updateDisplay(); // don't forget to call updateDisplay() or maybe do it automatically
                     changeState(10);
@@ -241,7 +244,7 @@ public class RobofestMain extends LinearOpMode {
                         closeClaw();
                     } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
                         // If black box E, go to state 50, otherwise 40
-                        changeState(50);
+                        changeState(40);
                     }
                     break;
                 case 40:
