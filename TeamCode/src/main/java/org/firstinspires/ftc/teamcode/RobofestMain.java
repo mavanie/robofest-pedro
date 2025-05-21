@@ -73,7 +73,7 @@ public class RobofestMain extends LinearOpMode {
         Pose white1Pose = new Pose(13, 17.5, Math.toRadians(90));
         //noinspection unused
         Pose white2Pose = new Pose(25, 17.5, Math.toRadians(90));
-        Pose blackDropPose = new Pose(47.5,24, Math.toRadians(180));
+        Pose blackDropPose = new Pose(47.5,22, Math.toRadians(180));
         Pose medalDropPose = new Pose(50,22.5, Math.toRadians(180));
 
         Pose crossPose = new Pose(55, 20, Math.toRadians(0));
@@ -91,7 +91,7 @@ public class RobofestMain extends LinearOpMode {
         //noinspection UnnecessaryLocalVariable
         Pose whitePose = white2Pose;
         Pose stackPose = new Pose(boxCpose.getX(), boxCpose.getY(), boxCpose.getHeading());
-        Pose blackPose = new Pose(boxEpose.getX(), boxBpose.getY()-1, boxEpose.getHeading());
+        Pose blackPose = new Pose(boxBpose.getX(), boxBpose.getY()-1, boxBpose.getHeading());
 //        Uncomment lines in white box if back box is E. Also change case 30.
 
         follower.setStartingPose(startPose);
@@ -104,15 +104,15 @@ public class RobofestMain extends LinearOpMode {
             .build();
         PathChain stack = follower.pathBuilder()
 //            Next 6 lines for black box E only
-            .addPath(new BezierLine(new Point(whitePose), new Point(legoEast.getX()-1, legoEast.getY())))
-            .addPath(new BezierLine(new Point(legoEast.getX()-1, legoEast.getY()), new Point(crossPose)))
-            .setConstantHeadingInterpolation(legoEast.getHeading())
-            .addPath(new BezierLine(new Point(crossPose), new Point(stackPose.getX(), stackPose.getY()+3)))
-            .setConstantHeadingInterpolation(stackPose.getHeading())
-            .addParametricCallback(0, this::liftUp)
-//           Comment out next 2 lines for black box E
-//            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
+//            .addPath(new BezierLine(new Point(whitePose), new Point(legoEast.getX()-1, legoEast.getY())))
+//            .addPath(new BezierLine(new Point(legoEast.getX()-1, legoEast.getY()), new Point(crossPose)))
+//            .setConstantHeadingInterpolation(legoEast.getHeading())
+//            .addPath(new BezierLine(new Point(crossPose), new Point(stackPose.getX(), stackPose.getY()+3)))
 //            .setConstantHeadingInterpolation(stackPose.getHeading())
+//            .addParametricCallback(0, this::liftUp)
+//           Comment out next 2 lines for black box E
+            .addPath(new BezierLine(new Point(whitePose), new Point (stackPose.getX(), stackPose.getY()+3)))
+            .setConstantHeadingInterpolation(stackPose.getHeading())
             .addPath(new BezierLine(new Point(stackPose.getX(), stackPose.getY()+3), new Point(stackPose)))
             .setPathEndTimeoutConstraint(0)
             .build();
@@ -241,7 +241,7 @@ public class RobofestMain extends LinearOpMode {
                         closeClaw();
                     } else if (stateTime.getElapsedTimeSeconds() > 1.4) {
                         // If black box E, go to state 50, otherwise 40
-                        changeState(50);
+                        changeState(40);
                     }
                     break;
                 case 40:
